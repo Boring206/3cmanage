@@ -1,8 +1,7 @@
 // FRONTEND/js/my-orders.js
-document.addEventListener('DOMContentLoaded', function() {
-    const ordersContainer = document.getElementById('orders-container');
+document.addEventListener('DOMContentLoaded', function() {    const ordersContainer = document.getElementById('orders-container');
     const paginationContainer = document.getElementById('orders-pagination');
-    const API_BASE_PATH = '/BACKEND/public'; // <--- 請再次確認並修改這裡
+    const API_BASE_PATH = '/3Cmanage/BACKEND/public'; // 確保大小寫與資料夾名稱一致
 
     // 頁面保護：檢查是否登入
     const storedUserData = localStorage.getItem('userData');

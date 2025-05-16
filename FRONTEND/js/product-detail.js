@@ -2,10 +2,8 @@
 document.addEventListener('DOMContentLoaded', function() {
     const productDetailDiv = document.getElementById('product-detail-content');
     const loadingMessage = '<p>載入產品詳情中...</p>';
-    const errorMessage = '<p>無法載入產品詳情。</p>';
-
-    // !!! 非常重要：根據您的伺服器設定修改此 API 基本路徑 !!!
-    const API_BASE_PATH = '/BACKEND/public'; // <--- 請修改這裡
+    const errorMessage = '<p>無法載入產品詳情。</p>';    // !!! 非常重要：根據您的伺服器設定修改此 API 基本路徑 !!!
+    const API_BASE_PATH = '/3Cmanage/BACKEND/public'; // 注意大小寫要和資料夾名稱一致
 
     const urlParams = new URLSearchParams(window.location.search);
     const productId = urlParams.get('id');

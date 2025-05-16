@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const addressFormMessage = document.getElementById('address-form-message');
     let editingAddressId = null;
 
-    const API_BASE_PATH = '/BACKEND/public'; // <--- 請再次確認並修改這裡
+    const API_BASE_PATH = '/3Cmanage/BACKEND/public'; // 確保大小寫與資料夾名稱一致
 
     // 頁面保護
     const storedUserData = localStorage.getItem('userData');

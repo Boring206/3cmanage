@@ -1,13 +1,14 @@
 <IfModule mod_rewrite.c>
     RewriteEngine On
+    # 如果您的專案是放在 localhost 下的 3Cmanage 目錄，
+    # 並且您希望透過 localhost/3Cmanage/BACKEND/public/ 作為 API 的基礎路徑
+    RewriteBase /3Cmanage/BACKEND/public/
 
-    # 您的專案相對於 Apache DocumentRoot (C:\xampp\htdocs\) 的 public 資料夾路徑
-    RewriteBase /3Cmanage/public/
-
-    # 如果請求的不是一個實際存在的檔案
+    # 將所有請求導向到 index.php，除非是實際存在的檔案或目錄
     RewriteCond %{REQUEST_FILENAME} !-f
-    # 而且請求的不是一個實際存在的目錄
     RewriteCond %{REQUEST_FILENAME} !-d
-    # 將請求重寫到 index.php，並將原始請求的路徑作為查詢參數 url 傳遞
     RewriteRule ^(.*)$ index.php?url=$1 [L,QSA]
 </IfModule>
+
+# 可選：防止列出目錄內容
+Options -Indexes

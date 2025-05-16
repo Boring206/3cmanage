@@ -1,8 +1,7 @@
 // FRONTEND/js/navigation.js
 document.addEventListener('DOMContentLoaded', function() {
-    const navigationElement = document.getElementById('main-navigation');
-    // !!! 非常重要：根據您的伺服器設定修改此 API 基本路徑 !!!
-    const API_BASE_PATH = '/BACKEND/public'; // <--- 請修改這裡
+    const navigationElement = document.getElementById('main-navigation');    // !!! 非常重要：根據您的伺服器設定修改此 API 基本路徑 !!!
+    const API_BASE_PATH = '/3Cmanage/BACKEND/public'; // 注意大小寫要和資料夾名稱一致
 
     function renderNavigation() {
         if (!navigationElement) {

@@ -15,10 +15,8 @@ document.addEventListener('DOMContentLoaded', function() {
         alert('購物車是空的，請先添加商品');
         window.location.href = 'index.html';
         return;
-    }
-
-    // !!! 非常重要：根據您的伺服器設定修改此 API 基本路徑 !!!
-    const API_BASE_PATH = '/BACKEND/public';
+    }    // !!! 非常重要：根據您的伺服器設定修改此 API 基本路徑 !!!
+    const API_BASE_PATH = '/3Cmanage/BACKEND/public'; // 確保大小寫與資料夾名稱一致
 
     // 獲取用戶資訊
     let user = null;

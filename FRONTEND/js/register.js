@@ -1,10 +1,8 @@
 // FRONTEND/js/register.js
 document.addEventListener('DOMContentLoaded', function() {
     const registerForm = document.getElementById('register-form');
-    const messageElement = document.getElementById('form-message');
-
-    // !!! 非常重要：根據您的伺服器設定修改此 API 基本路徑 !!!
-    const API_BASE_PATH = '/BACKEND/public'; // <--- 請修改這裡
+    const messageElement = document.getElementById('form-message');    // !!! 非常重要：根據您的伺服器設定修改此 API 基本路徑 !!!
+    const API_BASE_PATH = '/3Cmanage/BACKEND/public'; // 注意大小寫要和資料夾名稱一致
 
     if (registerForm) {
         registerForm.addEventListener('submit', function(event) {

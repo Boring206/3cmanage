@@ -66,18 +66,54 @@ if (isset($_GET['url'])) { // 'url' 來自 .htaccess 的 RewriteRule
 try {
     $router = Core\Router::load(BASE_PATH . '/routes/web.php');
     $router->direct($requestUri, $requestMethod);
-} catch (\Exception $e) {
-    $statusCode = method_exists($e, 'getCode') && $e->getCode() >= 400 && $e->getCode() < 600 ? $e->getCode() : 500;
+} catch (\Throwable $e) { // 改用 \Throwable 可以捕捉 Exception 和 Error
+    $statusCode = ($e instanceof \Core\HttpException) // 假設您未來可能定義自訂的 HttpException
+                  ? $e->getCode()
+                  : (method_exists($e, 'getCode') && is_numeric($e->getCode()) && $e->getCode() >= 400 && $e->getCode() < 600 ? $e->getCode() : 500);
+
+    if ($statusCode < 400 || $statusCode > 599) { // 確保狀態碼在 HTTP 錯誤範圍內
+        $statusCode = 500;
+    }
+
     http_response_code($statusCode);
+    // 清除任何可能已存在的輸出
+    if (ob_get_level() > 0) {
+        ob_end_clean();
+    }
     header('Content-Type: application/json; charset=utf-8');
-    echo json_encode([
-        'error' => [
-            'message' => $e->getMessage(),
-            'file' => basename($e->getFile()),
-            'line' => $e->getLine(),
-            // 'trace' => explode("\n", $e->getTraceAsString()) // 開發時可以開啟更詳細的追蹤
-        ]
-    ], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
-    error_log("Routing Exception: {$e->getMessage()} in {$e->getFile()}:{$e->getLine()}");
+
+    $errorDetails = [
+        'message' => $e->getMessage(),
+        'file' => $e->getFile(), // 顯示完整路徑方便調試
+        'line' => $e->getLine(),
+    ];
+
+    // 在開發環境中可以考慮加入追蹤信息
+    if (($_ENV['APP_ENV'] ?? 'production') === 'development') {
+        $errorDetails['trace'] = explode("\n", $e->getTraceAsString());
+        // 如果是 PDOException，加入更詳細的 SQL 錯誤資訊
+        if ($e instanceof \PDOException && isset($e->errorInfo)) {
+            $errorDetails['sql_error_info'] = $e->errorInfo;
+        }
+    }
+
+    echo json_encode(['error' => $errorDetails], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+    
+    // 記錄詳細錯誤到伺服器日誌
+    $logMessage = sprintf(
+        "[%s] %s in %s:%d. URI: %s, Method: %s, IP: %s",
+        date('Y-m-d H:i:s'),
+        $e->getMessage(),
+        $e->getFile(),
+        $e->getLine(),
+        $_SERVER['REQUEST_URI'] ?? 'N/A',
+        $_SERVER['REQUEST_METHOD'] ?? 'N/A',
+        $_SERVER['REMOTE_ADDR'] ?? 'N/A'
+    );
+    if (isset($errorDetails['trace'])) {
+        $logMessage .= "\nTrace:\n" . $e->getTraceAsString();
+    }
+    error_log("PHP Error/Exception: " . $logMessage);
+    
+    exit; // 確保在輸出錯誤後終止腳本
 }
-?>

@@ -1,10 +1,8 @@
 // FRONTEND/js/login.js
 document.addEventListener('DOMContentLoaded', function() {
     const loginForm = document.getElementById('login-form');
-    const messageElement = document.getElementById('form-message');
-
-    // !!! 非常重要：根據您的伺服器設定修改此 API 基本路徑 !!!
-    const API_BASE_PATH = '/BACKEND/public'; // <--- 請修改這裡
+    const messageElement = document.getElementById('form-message');    // !!! 非常重要：根據您的伺服器設定修改此 API 基本路徑 !!!
+    const API_BASE_PATH = '/3Cmanage/BACKEND/public'; // 注意大小寫要和資料夾名稱一致
 
     // 檢查是否已經登入，如果是，可以考慮導向到其他頁面
     if (localStorage.getItem('userToken')) { // 假設您用 token，或檢查 session 狀態
