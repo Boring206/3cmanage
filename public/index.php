@@ -1,66 +1,83 @@
 <?php
 // 3Cmanage/public/index.php
-declare(strict_types=1); // 建議開啟嚴格模式
+declare(strict_types=1);
 
-// 顯示所有錯誤 (開發階段)
 ini_set('display_errors', '1');
 ini_set('display_startup_errors', '1');
 error_reporting(E_ALL);
 
-// 定義應用程式根目錄路徑 (可選，但方便)
-define('BASE_PATH', dirname(__DIR__)); // 3Cmanage/
+if (!defined('BASE_PATH')) {
+    define('BASE_PATH', dirname(__DIR__));
+}
 
-// 載入 Composer 的 autoload.php
 require BASE_PATH . '/vendor/autoload.php';
 
-// 載入 .env 環境變數
 try {
     $dotenv = Dotenv\Dotenv::createImmutable(BASE_PATH);
     $dotenv->load();
 } catch (\Dotenv\Exception\InvalidPathException $e) {
-    // 如果 .env 檔案不存在，可以選擇不執行任何操作或記錄錯誤
-    // die("Could not find .env file: " . $e->getMessage()); // 開發時可以這樣提示
-    error_log("Could not find .env file: " . $e->getMessage());
+    error_log("Could not find .env file (this is okay if using default fallbacks or server env vars): " . $e->getMessage());
+} catch (\Throwable $e) {
+    error_log("Error loading .env file: " . $e->getMessage());
 }
 
+if (session_status() == PHP_SESSION_NONE) {
+    // 可選: session_set_cookie_params(['lifetime' => 3600, 'httponly' => true, 'samesite' => 'Lax']);
+    session_start();
+}
 
-// --- 路由處理 (簡易版，之後會用 Core\Router) ---
-// 為了先解決 Core\DB 的問題，我們暫時不完整實作路由
-// 但為了讓 UserController 的方法能被呼叫到，我們做個簡單的測試
-
-$requestUri = trim(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), '/');
 $requestMethod = $_SERVER['REQUEST_METHOD'];
 
-// 測試路由 (假設您想測試 listMyDevices)
-if ($requestUri === 'my-devices' && $requestMethod === 'GET') {
-    // 模擬登入 (之後會用真正的 session)
-    if (session_status() == PHP_SESSION_NONE) {
-        session_start();
+// 處理 PUT/PATCH/DELETE 等方法的 _method 覆寫 (通常用於 HTML 表單)
+if ($requestMethod === 'POST' && isset($_POST['_method'])) {
+    $methodOverride = strtoupper(trim($_POST['_method']));
+    if (in_array($methodOverride, ['PUT', 'PATCH', 'DELETE'])) {
+        $requestMethod = $methodOverride;
     }
-    // 假設 user_id 1 已登入 (僅供測試)
-    // 在實際應用中，這應該在登入流程中設定
-    if (!isset($_SESSION['user_id'])) {
-         $_SESSION['user_id'] = 1; 
-         $_SESSION['user_role'] = 'customer';
-         error_log("Simulating login for user_id: 1 for testing /my-devices");
-    }
-
-
-    $controller = new App\Controllers\UserController();
-    $controller->listMyDevices();
-    exit;
 }
 
-echo "3Cmanage Backend. No specific route matched for: /{$requestUri}";
+// URI 解析 (配合 .htaccess 使用 RewriteRule ^(.*)$ index.php?url=$1 [L,QSA])
+$requestUri = '';
+if (isset($_GET['url'])) { // 'url' 來自 .htaccess 的 RewriteRule
+    $requestUri = trim($_GET['url'], '/');
+} else {
+    // 如果沒有 'url' 參數，嘗試從 REQUEST_URI 解析 (適用於未使用特定 RewriteRule 或 PHP 內建伺服器)
+    // 假設 .htaccess 或伺服器設定已處理好基礎路徑 (例如 Apache 的 DocumentRoot 或 RewriteBase)
+    $uriPath = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+    // 如果您的應用程式在子目錄下，例如 /3cmanage/public/，並且 DocumentRoot 是 htdocs
+    // 您需要移除基礎路徑部分。
+    // 例如，如果 RewriteBase 是 /3Cmanage/public/
+    // 這裡的 $uriPath 可能是 /3Cmanage/public/products
+    // 我們需要得到 'products'
+    // 一個更通用的方法是讓 Web 伺服器配置 (VirtualHost DocumentRoot) 正確指向 public 目錄
+    // 或者，如果您堅持使用子目錄，則 RewriteBase 和這裡的解析邏輯需要非常小心地匹配。
+    // 為了簡化，我們先假設您的 Web 伺服器或 .htaccess 設定能讓這裡的 $uriPath 是應用程式的相對路徑。
+    // 如果您使用了我之前提供的 .htaccess (有 RewriteBase /3Cmanage/public/ 和 RewriteRule ^(.*)$ index.php?url=$1)
+    // 那麼 $_GET['url'] 的方式是最直接的。
 
-// 之後我們會用類似這樣的程式碼來載入路由並分派：
-/*
+    // 如果您沒有 .htaccess 或 .htaccess 的 RewriteRule 不傳遞 url GET 參數，
+    // 則需要根據您的伺服器設定和 RewriteBase 來調整此處的 $requestUri 提取邏輯。
+    // 例如，如果沒有 RewriteBase 但 DocumentRoot 正確指向 public:
+    // $requestUri = trim($uriPath, '/');
+}
+
+
+// 載入路由定義並分派請求
 try {
-    Core\Router::load(BASE_PATH . '/routes/web.php')
-        ->direct($requestUri, $requestMethod);
-} catch (Exception $e) {
-    http_response_code($e->getCode() ?: 500);
-    echo json_encode(['error' => $e->getMessage()]);
+    $router = Core\Router::load(BASE_PATH . '/routes/web.php');
+    $router->direct($requestUri, $requestMethod);
+} catch (\Exception $e) {
+    $statusCode = method_exists($e, 'getCode') && $e->getCode() >= 400 && $e->getCode() < 600 ? $e->getCode() : 500;
+    http_response_code($statusCode);
+    header('Content-Type: application/json; charset=utf-8');
+    echo json_encode([
+        'error' => [
+            'message' => $e->getMessage(),
+            'file' => basename($e->getFile()),
+            'line' => $e->getLine(),
+            // 'trace' => explode("\n", $e->getTraceAsString()) // 開發時可以開啟更詳細的追蹤
+        ]
+    ], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+    error_log("Routing Exception: {$e->getMessage()} in {$e->getFile()}:{$e->getLine()}");
 }
-*/
 ?>

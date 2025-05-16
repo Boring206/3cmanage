@@ -1,5 +1,6 @@
 <?php
 // 3Cmanage/core/Controller.php
+declare(strict_types=1);
 namespace Core; // <--- 非常重要：宣告命名空間
 
 class Controller {

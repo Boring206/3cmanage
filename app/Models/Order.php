@@ -160,14 +160,12 @@ class Order {
     // updateStatus 方法先前已有，我們可以調整它以供 Admin 使用
     // 先前的 updateStatus($orderId, $status, $userId = null, $userRole = null)
     // Admin 更新狀態時，不需要 $userId 和 $userRole 檢查 (或檢查 $userRole === 'store_admin')
-    // 為了清楚，我們可以建立一個 updateStatusForAdmin，或者讓現有的 updateStatus 處理 Admin 情況
-
-    /**
-     * 更新訂單的特定欄位 (例如狀態、追蹤編號等)
-     * @param int $orderId
-     * @param array $data 包含要更新欄位和值的關聯陣列
-     * @return bool True on success, false on failure
-     */
+    // 為了清楚，我們可以建立一個 updateStatusForAdmin，或者讓現有的 updateStatus 處理 Admin 情況    /**
+    //  * 更新訂單的特定欄位 (例如狀態、追蹤編號等)
+    //  * @param int $orderId
+    //  * @param array $data 包含要更新欄位和值的關聯陣列
+    //  * @return bool True on success, false on failure
+    //  */
     public function updateFields($orderId, $data) {
         if (empty($data)) {
             return false;
@@ -198,6 +196,22 @@ class Order {
             error_log("Order field update error for ID {$orderId}: " . $e->getMessage());
             return false;
         }
+    }
+    
+    /**
+     * [ADMIN] 更新訂單狀態
+     * @param int $orderId
+     * @param string $status
+     * @return bool True on success, false on failure
+     */
+    public function updateStatus($orderId, $status) {
+        // 驗證狀態是否為有效值
+        $validStatuses = ['pending', 'processing', 'shipped', 'delivered', 'cancelled', 'refunded'];
+        if (!in_array($status, $validStatuses)) {
+            return false;
+        }
+        
+        return $this->updateFields($orderId, ['status' => $status]);
     }
 }
 ?>
