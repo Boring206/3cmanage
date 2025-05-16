@@ -1,0 +1,20 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # 設定 RewriteBase，如果您的專案是透過 http://localhost/3Cmanage/public/ 這樣的子目錄訪問
+    # 這個路徑是相對於 Apache 的 DocumentRoot (通常是 htdocs)
+    RewriteBase /3Cmanage/public/
+
+    # 如果請求的不是一個實際存在的檔案
+    RewriteCond %{REQUEST_FILENAME} !-f
+    # 而且請求的不是一個實際存在的目錄
+    RewriteCond %{REQUEST_FILENAME} !-d
+    # 那麼，將請求重寫到 index.php，並將原始請求的路徑作為查詢參數 url 傳遞
+    # 或者，更常見的做法是讓 index.php 自己從 $_SERVER['REQUEST_URI'] 解析
+    # 我們先用一個常見的規則，讓 index.php 能更容易處理
+    RewriteRule ^(.*)$ index.php?url=$1 [L,QSA]
+
+    # 另一種常見的 RewriteRule，如果 index.php 會自己解析 $_SERVER['REQUEST_URI']
+    # 並移除 RewriteBase 部分：
+    # RewriteRule ^ index.php [L]
+</IfModule>
