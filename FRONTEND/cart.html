@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>購物車 - 3C管理系統</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/cart.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1 class="logo">3C管理系統</h1>
+            <nav id="main-navigation">
+                <!-- 動態生成的導航元素將在這裡顯示 -->
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <h1>購物車</h1>
+        
+        <div class="cart-container">
+            <div id="cart-items" class="cart-content">
+                <!-- 購物車內容將在這裡動態載入 -->
+                <p>載入中...</p>
+            </div>
+            
+            <div class="cart-sidebar">
+                <div class="order-summary">
+                    <h3>訂單摘要</h3>
+                    <div id="order-summary">
+                        <!-- 訂單摘要內容將在這裡動態載入 -->
+                        <div class="summary-row">
+                            <span>商品小計:</span>
+                            <span>$0.00</span>
+                        </div>
+                        <div class="summary-row">
+                            <span>運費:</span>
+                            <span>$0.00</span>
+                        </div>
+                        <div class="summary-row total">
+                            <span>總計:</span>
+                            <span>$0.00</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <button id="checkout-btn" class="btn green">結帳</button>
+                <button id="continue-shopping" class="btn outline">繼續購物</button>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2023 3C管理系統. 保留所有權利.</p>
+        </div>
+    </footer>
+
+    <script src="js/navigation.js"></script>
+    <script src="js/shopping-cart.js"></script>
+    <script src="js/cart.js"></script>
+</body>
+</html>

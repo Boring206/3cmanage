@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>結帳 - 3C管理系統</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/form.css">
+    <link rel="stylesheet" href="css/cart.css">
+    <link rel="stylesheet" href="css/checkout.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1 class="logo">3C管理系統</h1>
+            <nav id="main-navigation">
+                <!-- 動態生成的導航元素將在這裡顯示 -->
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <h1>結帳</h1>
+        
+        <div class="checkout-container">
+            <div class="checkout-form">
+                <div class="checkout-section">
+                    <h3>收件資訊</h3>
+                    <div id="address-selection">
+                        <div class="form-group">
+                            <label for="select-address">選擇地址:</label>
+                            <select id="select-address">
+                                <option value="">-- 選擇已保存的地址 --</option>
+                                <!-- 地址選項將動態載入 -->
+                            </select>
+                        </div>
+                        <button id="new-address-btn" class="btn outline">新增地址</button>
+                    </div>
+                    
+                    <div id="address-form" style="display: none;">
+                        <form id="shipping-form">
+                            <div class="form-group">
+                                <label for="recipient_name">收件人姓名:</label>
+                                <input type="text" id="recipient_name" name="recipient_name" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="phone">聯絡電話:</label>
+                                <input type="tel" id="phone" name="phone" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="postal_code">郵遞區號:</label>
+                                <input type="text" id="postal_code" name="postal_code" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="city">城市:</label>
+                                <input type="text" id="city" name="city" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="address_line1">地址第一行:</label>
+                                <input type="text" id="address_line1" name="address_line1" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="address_line2">地址第二行: (選填)</label>
+                                <input type="text" id="address_line2" name="address_line2">
+                            </div>
+                            <div class="form-check">
+                                <input type="checkbox" id="save_address" name="save_address">
+                                <label for="save_address">儲存此地址以供未來使用</label>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                
+                <div class="checkout-section">
+                    <h3>付款方式</h3>
+                    <form id="payment-form">
+                        <div class="payment-options">
+                            <div class="payment-option">
+                                <input type="radio" id="payment-cod" name="payment_method" value="cod" checked>
+                                <label for="payment-cod">貨到付款</label>
+                            </div>
+                            
+                            <div class="payment-option">
+                                <input type="radio" id="payment-credit" name="payment_method" value="credit">
+                                <label for="payment-credit">信用卡</label>
+                            </div>
+                            
+                            <div class="payment-option">
+                                <input type="radio" id="payment-transfer" name="payment_method" value="transfer">
+                                <label for="payment-transfer">銀行轉帳</label>
+                            </div>
+                        </div>
+                        
+                        <!-- 信用卡付款表單，初始為隱藏 -->
+                        <div id="credit-card-form" style="display: none;">
+                            <div class="form-group">
+                                <label for="card_number">信用卡號碼:</label>
+                                <input type="text" id="card_number" name="card_number" placeholder="XXXX XXXX XXXX XXXX">
+                            </div>
+                            <div class="card-details">
+                                <div class="form-group">
+                                    <label for="card_name">持卡人姓名:</label>
+                                    <input type="text" id="card_name" name="card_name">
+                                </div>
+                                <div class="form-group">
+                                    <label for="expiry_date">到期日:</label>
+                                    <input type="text" id="expiry_date" name="expiry_date" placeholder="MM/YY">
+                                </div>
+                                <div class="form-group">
+                                    <label for="cvv">CVV:</label>
+                                    <input type="text" id="cvv" name="cvv" maxlength="3" placeholder="123">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 銀行轉帳資訊，初始為隱藏 -->
+                        <div id="bank-transfer-info" style="display: none;">
+                            <p>請於下單後24小時內，將款項轉帳至以下帳戶：</p>
+                            <p><strong>銀行名稱:</strong> 範例銀行</p>
+                            <p><strong>帳號:</strong> 1234-5678-9012-3456</p>
+                            <p><strong>戶名:</strong> 3C管理系統</p>
+                            <p class="bank-note">※ 完成轉帳後，請保留轉帳收據，我們將於確認款項後安排出貨。</p>
+                        </div>
+                    </form>
+                </div>
+                
+                <div class="checkout-section">
+                    <h3>訂單備註</h3>
+                    <div class="form-group">
+                        <textarea id="order_notes" name="order_notes" placeholder="有任何特別要求，請在此填寫。"></textarea>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="checkout-sidebar">
+                <div class="order-summary">
+                    <h3>訂單摘要</h3>
+                    <div id="order-items">
+                        <!-- 訂單商品將在這裡動態載入 -->
+                    </div>
+                    
+                    <div id="order-summary">
+                        <!-- 訂單摘要將在這裡動態載入 -->
+                    </div>
+                </div>
+                
+                <button id="place-order-btn" class="btn green">確認下單</button>
+                <button id="back-to-cart" class="btn outline">返回購物車</button>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2023 3C管理系統. 保留所有權利.</p>
+        </div>
+    </footer>
+
+    <script src="js/navigation.js"></script>
+    <script src="js/shopping-cart.js"></script>
+    <script src="js/checkout.js"></script>
+</body>
+</html>

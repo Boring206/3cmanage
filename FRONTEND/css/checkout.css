@@ -1,0 +1,163 @@
+/* 結帳頁面專用樣式 */
+
+.checkout-container {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 30px;
+    margin-top: 20px;
+}
+
+.checkout-form {
+    background-color: white;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    padding: 20px;
+}
+
+.checkout-sidebar {
+    background-color: white;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    padding: 20px;
+    position: sticky;
+    top: 20px;
+    height: fit-content;
+}
+
+.checkout-section {
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #eee;
+}
+
+.checkout-section h3 {
+    margin: 0 0 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+.checkout-section:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+}
+
+#address-selection {
+    display: flex;
+    gap: 15px;
+    align-items: flex-end;
+}
+
+#address-selection .form-group {
+    flex-grow: 1;
+}
+
+#address-selection button {
+    height: 42px;
+}
+
+.payment-options {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.payment-option {
+    display: flex;
+    align-items: center;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.payment-option:hover {
+    background-color: #f9f9f9;
+}
+
+.payment-option input[type="radio"] {
+    margin-right: 10px;
+}
+
+.payment-option.selected {
+    border-color: #3498db;
+    background-color: rgba(52, 152, 219, 0.05);
+}
+
+#bank-transfer-info {
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 15px;
+    margin-top: 15px;
+}
+
+.bank-note {
+    font-size: 0.9em;
+    color: #666;
+    margin-top: 10px;
+}
+
+#order-items {
+    margin-bottom: 20px;
+}
+
+.order-item {
+    display: grid;
+    grid-template-columns: 60px 1fr auto;
+    gap: 10px;
+    padding: 10px 0;
+    border-bottom: 1px solid #eee;
+    align-items: center;
+}
+
+.order-item-image img {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 4px;
+    border: 1px solid #eee;
+}
+
+.order-item-details h4 {
+    margin: 0 0 5px;
+    font-size: 0.9rem;
+}
+
+.order-item-details .quantity {
+    color: #666;
+    font-size: 0.8rem;
+}
+
+.order-item-price {
+    font-weight: bold;
+    font-size: 0.9rem;
+}
+
+.form-check {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 15px 0;
+}
+
+.form-check input[type="checkbox"] {
+    width: auto;
+}
+
+/* 響應式設計 */
+@media (max-width: 768px) {
+    .checkout-container {
+        grid-template-columns: 1fr;
+    }
+    
+    #address-selection {
+        flex-direction: column;
+    }
+    
+    #address-selection button {
+        width: 100%;
+    }
+}

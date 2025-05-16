@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的設備與保固 - 3C 管理系統</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .device-list { list-style: none; padding: 0; }
+        .device-item { display: flex; background: #fff; border: 1px solid #ddd; margin-bottom: 15px; padding: 15px; border-radius: 5px; }
+        .device-item img { width: 100px; height: 100px; object-fit: cover; margin-right: 15px; border: 1px solid #eee; }
+        .device-info { flex-grow: 1; }
+        .device-info h3 { margin-top: 0; }
+        .device-info p { margin: 5px 0; font-size: 0.9em; }
+        .warranty-status-active { color: green; font-weight: bold; }
+        .warranty-status-expired { color: red; }
+        .warranty-status-voided { color: orange; }
+    </style>
+</head>
+<body>
+    <header>
+        <nav id="main-navigation"></nav>
+    </header>
+    <main>
+        <h1>我的設備與保固</h1>
+        <div id="devices-container">
+            <p>載入設備資訊中...</p>
+        </div>
+    </main>
+
+    <script src="js/navigation.js"></script>
+    <script src="js/my-devices.js"></script>
+</body>
+</html>

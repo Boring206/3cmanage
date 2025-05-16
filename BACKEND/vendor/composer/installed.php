@@ -3,7 +3,7 @@
         'name' => 'yourname/3cmanage',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => '09df0079df81cdf4dca4049e7a4dbee3daa727fb',
+        'reference' => 'a65c51c2bb63aab4ce8f3b551f921578e008afa3',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -76,7 +76,7 @@
         'yourname/3cmanage' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => '09df0079df81cdf4dca4049e7a4dbee3daa727fb',
+            'reference' => 'a65c51c2bb63aab4ce8f3b551f921578e008afa3',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),

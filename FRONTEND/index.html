@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3C管理系統 - 首頁</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1 class="logo">3C管理系統</h1>
+            <nav id="main-navigation">
+                <!-- 動態生成的導航元素將在這裡顯示 -->
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <h1>產品列表</h1>
+        
+        <div class="filter-container">
+            <h3>篩選產品</h3>
+            <form id="filter-form">
+                <div class="form-group">
+                    <label for="category">產品類別:</label>
+                    <select id="category" name="category">
+                        <option value="">全部類別</option>
+                        <!-- 動態生成的類別選項將在這裡顯示 -->
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="brand">品牌:</label>
+                    <select id="brand" name="brand">
+                        <option value="">全部品牌</option>
+                        <!-- 動態生成的品牌選項將在這裡顯示 -->
+                    </select>
+                </div>
+                
+                <div class="form-group price-range">
+                    <label>價格範圍:</label>
+                    <input type="number" id="min_price" name="min_price" placeholder="最低價格">
+                    <span>到</span>
+                    <input type="number" id="max_price" name="max_price" placeholder="最高價格">
+                </div>
+                
+                <div class="form-group">
+                    <label for="search">關鍵字搜索:</label>
+                    <input type="text" id="search" name="search" placeholder="搜索產品名稱、品牌或型號">
+                </div>
+                
+                <button type="submit" id="apply-filters">套用篩選</button>
+                <button type="button" id="clear-filters">清除篩選</button>
+            </form>
+        </div>
+        
+        <div id="product-list">
+            <!-- 產品列表將動態載入到這裡 -->
+            載入中...
+        </div>
+        
+        <div class="shopping-cart-summary">
+            <button id="view-cart" class="btn">檢視購物車 (<span id="cart-count">0</span>)</button>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2023 3C管理系統. 保留所有權利.</p>
+        </div>
+    </footer>
+
+    <script src="js/navigation.js"></script>
+    <script src="js/shopping-cart.js"></script>
+    <script src="js/script.js"></script>
+</body>
+</html>

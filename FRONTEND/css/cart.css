@@ -1,0 +1,193 @@
+/* 購物車頁面專用樣式 */
+
+.cart-container {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 30px;
+    margin-top: 20px;
+}
+
+.cart-content {
+    background-color: white;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    padding: 20px;
+}
+
+.cart-sidebar {
+    background-color: white;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    padding: 20px;
+    position: sticky;
+    top: 20px;
+    height: fit-content;
+}
+
+.order-summary {
+    margin-bottom: 20px;
+}
+
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.summary-row.total {
+    font-weight: bold;
+    font-size: 1.2em;
+    border-top: 1px solid #333;
+    border-bottom: none;
+    padding-top: 15px;
+    margin-top: 5px;
+}
+
+#checkout-btn, #continue-shopping {
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+#continue-shopping {
+    background-color: transparent;
+    border: 1px solid #3498db;
+    color: #3498db;
+}
+
+#continue-shopping:hover {
+    background-color: #f4f4f4;
+}
+
+.btn.outline {
+    background-color: transparent;
+    border: 1px solid #3498db;
+    color: #3498db;
+}
+
+.btn.outline:hover {
+    background-color: #f4f4f4;
+}
+
+.btn.disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+.cart-item {
+    display: grid;
+    grid-template-columns: 80px 2fr 1fr 1fr auto;
+    align-items: center;
+    gap: 15px;
+    padding: 15px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.cart-item-image img {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 4px;
+    border: 1px solid #eee;
+}
+
+.cart-item-details h3 {
+    margin: 0 0 5px;
+    font-size: 1rem;
+}
+
+.cart-item-details .price {
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.cart-item-quantity {
+    display: flex;
+    align-items: center;
+}
+
+.quantity-btn {
+    width: 30px;
+    height: 30px;
+    background-color: #f4f4f4;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1.2em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.quantity-input {
+    width: 40px;
+    height: 30px;
+    text-align: center;
+    margin: 0 5px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.cart-item-total {
+    font-weight: bold;
+}
+
+.remove-item {
+    background-color: transparent;
+    border: none;
+    color: #999;
+    font-size: 1.5em;
+    cursor: pointer;
+    transition: color 0.3s;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.remove-item:hover {
+    color: #e74c3c;
+}
+
+.empty-cart {
+    text-align: center;
+    padding: 40px 0;
+    color: #666;
+}
+
+/* 響應式設計 */
+@media (max-width: 768px) {
+    .cart-container {
+        grid-template-columns: 1fr;
+    }
+    
+    .cart-item {
+        grid-template-columns: 60px 1fr auto;
+        grid-template-areas:
+            "image details remove"
+            "image quantity total";
+        gap: 10px;
+    }
+    
+    .cart-item-image {
+        grid-area: image;
+    }
+    
+    .cart-item-details {
+        grid-area: details;
+    }
+    
+    .cart-item-quantity {
+        grid-area: quantity;
+    }
+    
+    .cart-item-total {
+        grid-area: total;
+        justify-self: end;
+    }
+    
+    .remove-item {
+        grid-area: remove;
+    }
+}
