@@ -1,5 +1,6 @@
 // FRONTEND/js/my-orders.js
-document.addEventListener('DOMContentLoaded', function() {    const ordersContainer = document.getElementById('orders-container');
+document.addEventListener('DOMContentLoaded', function() {
+    const ordersContainer = document.getElementById('orders-container');
     const paginationContainer = document.getElementById('orders-pagination');
     const API_BASE_PATH = '/3Cmanage/BACKEND/public'; // 確保大小寫與資料夾名稱一致
 
@@ -15,14 +16,12 @@ document.addEventListener('DOMContentLoaded', function() {    const ordersContai
         fetch(`${API_BASE_PATH}/orders?page=${page}&limit=${limit}`, {
             method: 'GET',
             headers: {
-                'Content-Type': 'application/json',
-                // 如果後端需要 Session Cookie，瀏覽器會自動帶上。
-                // 如果使用 JWT，則需要從 localStorage 讀取並加入 Authorization header
-                // 'Authorization': `Bearer ${localStorage.getItem('userToken')}`
-            }
+                'Content-Type': 'application/json'
+            },
+            credentials: 'include'
         })
         .then(response => {
-            if (response.status === 401) { // 未授權
+            if (response.status === 401) {
                 localStorage.removeItem('userData');
                 window.location.href = 'login.html?redirect=my-orders.html&reason=session_expired';
                 throw new Error('Unauthorized');
@@ -63,7 +62,7 @@ document.addEventListener('DOMContentLoaded', function() {    const ordersContai
                 ordersHTML += '</ul>';
                 ordersContainer.innerHTML = ordersHTML;
 
-                renderPagination(data.meta.current_page, data.meta.last_page, data.meta.limit);
+                renderPagination(data.meta.current_page, data.meta.last_page, data.meta.per_page);
             } else {
                 ordersContainer.innerHTML = '<p>您目前沒有任何訂單。</p>';
                 paginationContainer.innerHTML = '';

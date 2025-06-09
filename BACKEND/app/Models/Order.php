@@ -13,8 +13,6 @@ class Order {
         $this->db = DB::getInstance()->getConnection();
     }
 
-    // ... (createOrderWithItems, findByIdForUser, findByUserId 已存在) ...
-
     /**
      * [ADMIN] 獲取所有訂單 (支持篩選和分頁)
      */
@@ -212,6 +210,184 @@ class Order {
         }
         
         return $this->updateFields($orderId, ['status' => $status]);
+    }
+
+    /**
+     * 根據用戶ID獲取訂單列表
+     * @param int $userId 用戶ID
+     * @param int $limit 每頁數量
+     * @param int $offset 偏移量
+     * @return array|false 訂單列表或false
+     */
+    public function getByUserId($userId, $limit = 10, $offset = 0) {
+        $sql = "SELECT o.*, 
+                       a.recipient_name, a.phone_number, a.postal_code, a.city, a.street, a.country 
+                FROM {$this->tableName} o
+                JOIN addresses a ON o.address_id = a.id
+                WHERE o.user_id = :user_id
+                ORDER BY o.order_date DESC
+                LIMIT :limit OFFSET :offset";
+        
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
+        $stmt->bindParam(':limit', $limit, PDO::PARAM_INT);
+        $stmt->bindParam(':offset', $offset, PDO::PARAM_INT);
+        
+        try {
+            $stmt->execute();
+            $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            
+            // 為每個訂單獲取訂單項目
+            foreach ($orders as &$order) {
+                $order['items'] = $this->getOrderItems($order['id']);
+            }
+            
+            return $orders;
+        } catch (\PDOException $e) {
+            error_log("Error fetching orders for user {$userId}: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * 計算用戶的訂單總數
+     * @param int $userId 用戶ID
+     * @return int 訂單總數
+     */
+    public function countByUserId($userId) {
+        $sql = "SELECT COUNT(*) as total FROM {$this->tableName} WHERE user_id = :user_id";
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
+        
+        try {
+            $stmt->execute();
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            return $result ? (int)$result['total'] : 0;
+        } catch (\PDOException $e) {
+            error_log("Error counting orders for user {$userId}: " . $e->getMessage());
+            return 0;
+        }
+    }
+
+    /**
+     * 根據訂單ID獲取訂單詳情（包含用戶權限檢查）
+     * @param int $orderId 訂單ID
+     * @param int $userId 用戶ID（可選，用於權限檢查）
+     * @return array|null 訂單詳情或null
+     */
+    public function findById($orderId, $userId = null) {
+        $sql = "SELECT o.*, 
+                       a.recipient_name, a.phone_number, a.postal_code, a.city, a.street, a.country 
+                FROM {$this->tableName} o
+                JOIN addresses a ON o.address_id = a.id
+                WHERE o.id = :order_id";
+        
+        $params = [':order_id' => $orderId];
+        
+        if ($userId !== null) {
+            $sql .= " AND o.user_id = :user_id";
+            $params[':user_id'] = $userId;
+        }
+        
+        $stmt = $this->db->prepare($sql);
+        
+        try {
+            $stmt->execute($params);
+            $order = $stmt->fetch(PDO::FETCH_ASSOC);
+            
+            if ($order) {
+                $order['items'] = $this->getOrderItems($orderId);
+            }
+            
+            return $order;
+        } catch (\PDOException $e) {
+            error_log("Error fetching order {$orderId}: " . $e->getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * 獲取訂單項目
+     * @param int $orderId 訂單ID
+     * @return array 訂單項目列表
+     */
+    public function getOrderItems($orderId) {
+        $sql = "SELECT oi.*, p.name as product_name, p.model_number as product_model, p.image_url as product_image_url 
+                FROM order_items oi
+                JOIN products p ON oi.product_id = p.id
+                WHERE oi.order_id = :order_id";
+        
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindParam(':order_id', $orderId, PDO::PARAM_INT);
+        
+        try {
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (\PDOException $e) {
+            error_log("Error fetching order items for order {$orderId}: " . $e->getMessage());
+            return [];
+        }
+    }
+
+    /**
+     * 創建訂單（包含訂單項目）
+     * @param array $orderData 訂單數據
+     * @param array $items 訂單項目
+     * @return int|false 新建訂單ID或false
+     */
+    public function create($orderData, $items) {
+        try {
+            $this->db->beginTransaction();
+            
+            // 計算總金額
+            $totalAmount = $orderData['subtotal_amount'] + $orderData['shipping_fee'] - $orderData['discount_amount'];
+            
+            // 插入訂單
+            $sql = "INSERT INTO {$this->tableName} 
+                    (user_id, address_id, subtotal_amount, shipping_fee, discount_amount, total_amount, payment_method, transaction_id, notes, status, order_date) 
+                    VALUES (:user_id, :address_id, :subtotal_amount, :shipping_fee, :discount_amount, :total_amount, :payment_method, :transaction_id, :notes, 'pending', NOW())";
+            
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([
+                ':user_id' => $orderData['user_id'],
+                ':address_id' => $orderData['address_id'],
+                ':subtotal_amount' => $orderData['subtotal_amount'],
+                ':shipping_fee' => $orderData['shipping_fee'],
+                ':discount_amount' => $orderData['discount_amount'],
+                ':total_amount' => $totalAmount,
+                ':payment_method' => $orderData['payment_method'],
+                ':transaction_id' => $orderData['transaction_id'],
+                ':notes' => $orderData['notes']
+            ]);
+            
+            $orderId = $this->db->lastInsertId();
+            
+            // 插入訂單項目
+            $itemSql = "INSERT INTO order_items (order_id, product_id, quantity, price_at_purchase) VALUES (?, ?, ?, ?)";
+            $itemStmt = $this->db->prepare($itemSql);
+            
+            foreach ($items as $item) {
+                $itemStmt->execute([
+                    $orderId,
+                    $item['product_id'],
+                    $item['quantity'],
+                    $item['price']
+                ]);
+                
+                // 更新產品庫存
+                $updateStockSql = "UPDATE products SET stock_quantity = stock_quantity - ? WHERE id = ?";
+                $updateStockStmt = $this->db->prepare($updateStockSql);
+                $updateStockStmt->execute([$item['quantity'], $item['product_id']]);
+            }
+            
+            $this->db->commit();
+            return $orderId;
+            
+        } catch (\PDOException $e) {
+            $this->db->rollBack();
+            error_log("Error creating order: " . $e->getMessage());
+            return false;
+        }
     }
 }
 ?>

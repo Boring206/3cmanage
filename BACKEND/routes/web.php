@@ -11,12 +11,12 @@ $router->post('login', 'AuthController@login');          // 登入帳號
 // --- 一般用戶路由 (Customer Routes - 需要登入) ---
 $router->post('logout', 'AuthController@logout');   // 登出路由
 
-// 地址管理 (Address Management)
-$router->get('my/addresses', 'OrderController@listAddresses');              // 列出我的所有地址
-$router->post('my/addresses', 'OrderController@addAddress');                // 新增地址
-$router->put('my/addresses/{id}', 'OrderController@updateAddress');         // 修改地址
-$router->delete('my/addresses/{id}', 'OrderController@deleteAddress');      // 刪除地址
-$router->post('my/addresses/{id}/set-default', 'OrderController@setDefaultAddress'); // 設定為預設地址
+// 地址管理 (Address Management) - 修復路由路徑
+$router->get('addresses', 'OrderController@listAddresses');              // 列出我的所有地址
+$router->post('addresses', 'OrderController@addAddress');                // 新增地址
+$router->put('addresses/{id}', 'OrderController@updateAddress');         // 修改地址
+$router->delete('addresses/{id}', 'OrderController@deleteAddress');      // 刪除地址
+$router->post('addresses/{id}/set-default', 'OrderController@setDefaultAddress'); // 設定為預設地址
 
 // 訂單處理 (Order Management)
 $router->post('orders', 'OrderController@createOrder');                 // 選擇3C並下訂單

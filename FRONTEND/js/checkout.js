@@ -15,7 +15,9 @@ document.addEventListener('DOMContentLoaded', function() {
         alert('購物車是空的，請先添加商品');
         window.location.href = 'index.html';
         return;
-    }    // !!! 非常重要：根據您的伺服器設定修改此 API 基本路徑 !!!
+    }
+
+    // !!! 非常重要：根據您的伺服器設定修改此 API 基本路徑 !!!
     const API_BASE_PATH = '/3Cmanage/BACKEND/public'; // 確保大小寫與資料夾名稱一致
 
     // 獲取用戶資訊
@@ -105,9 +107,11 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!selectAddress) return;
 
         fetch(`${API_BASE_PATH}/addresses`, {
+            method: 'GET',
             headers: {
-                'Authorization': `Bearer ${localStorage.getItem('userToken')}`
-            }
+                'Content-Type': 'application/json'
+            },
+            credentials: 'include'
         })
         .then(response => {
             if (!response.ok) {
@@ -126,7 +130,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 data.data.forEach(address => {
                     const option = document.createElement('option');
                     option.value = address.id;
-                    option.textContent = `${address.recipient_name} - ${address.city} ${address.address_line1}`;
+                    option.textContent = `${address.recipient_name} - ${address.city} ${address.street}`;
                     option.dataset.address = JSON.stringify(address);
                     selectAddress.appendChild(option);
                 });
@@ -291,11 +295,11 @@ document.addEventListener('DOMContentLoaded', function() {
             
             addressData = {
                 recipient_name: recipientName,
-                phone: phone,
+                phone_number: phone,
                 postal_code: postalCode,
                 city: city,
-                address_line1: addressLine1,
-                address_line2: addressLine2
+                street: addressLine1 + (addressLine2 ? ' ' + addressLine2 : ''),
+                country: 'Taiwan'
             };
             
             // 如果用戶選擇保存地址
@@ -323,8 +327,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 alert('請填寫完整的信用卡資訊');
                 return;
             }
-            
-            // 這裡可以添加信用卡號碼格式驗證...
         }
         
         // 獲取訂單備註
@@ -337,14 +339,34 @@ document.addEventListener('DOMContentLoaded', function() {
                 quantity: item.quantity,
                 price: item.price
             })),
-            address: addressData,
+            address_id: addressData.id || null,
             payment_method: paymentMethod,
             notes: orderNotes,
-            subtotal: shoppingCart.getTotalPrice(),
-            shipping_fee: 100, // 假設固定運費
-            total: shoppingCart.getTotalPrice() + 100
+            subtotal_amount: shoppingCart.getTotalPrice(),
+            shipping_fee: 100,
+            total_amount: shoppingCart.getTotalPrice() + 100
         };
         
+        // 如果是新地址，需要先創建地址
+        if (!addressData.id) {
+            // 創建新地址然後提交訂單
+            saveUserAddress(addressData).then(savedAddress => {
+                if (savedAddress && savedAddress.id) {
+                    orderData.address_id = savedAddress.id;
+                    submitOrderWithData(orderData);
+                } else {
+                    alert('保存地址失敗，請重試');
+                }
+            }).catch(error => {
+                console.error('保存地址錯誤:', error);
+                alert('保存地址時出錯，請重試');
+            });
+        } else {
+            submitOrderWithData(orderData);
+        }
+    }
+
+    function submitOrderWithData(orderData) {
         // 顯示提交按鈕載入狀態
         placeOrderBtn.disabled = true;
         placeOrderBtn.textContent = '處理訂單中...';
@@ -353,9 +375,9 @@ document.addEventListener('DOMContentLoaded', function() {
         fetch(`${API_BASE_PATH}/orders`, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('userToken')}`
+                'Content-Type': 'application/json'
             },
+            credentials: 'include',
             body: JSON.stringify(orderData)
         })
         .then(response => {
@@ -365,7 +387,7 @@ document.addEventListener('DOMContentLoaded', function() {
             return response.json();
         })
         .then(data => {
-            if (data && data.data && data.data.id) {
+            if (data && data.order && data.order.id) {
                 // 訂單建立成功
                 alert('訂單建立成功！');
                 
@@ -373,7 +395,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 shoppingCart.clearCart();
                 
                 // 跳轉到訂單確認頁面
-                window.location.href = `order-confirmation.html?id=${data.data.id}`;
+                window.location.href = `order-confirmation.html?id=${data.order.id}`;
             } else {
                 throw new Error('服務器回應格式錯誤');
             }
@@ -391,12 +413,12 @@ document.addEventListener('DOMContentLoaded', function() {
      * 保存用戶地址到後端
      */
     function saveUserAddress(addressData) {
-        fetch(`${API_BASE_PATH}/addresses`, {
+        return fetch(`${API_BASE_PATH}/addresses`, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('userToken')}`
+                'Content-Type': 'application/json'
             },
+            credentials: 'include',
             body: JSON.stringify(addressData)
         })
         .then(response => {
@@ -407,11 +429,7 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .then(data => {
             console.log('地址保存成功:', data);
-            // 不需要特別處理，因為訂單處理會繼續進行
-        })
-        .catch(error => {
-            console.error('保存地址時出錯:', error);
-            // 不阻止訂單流程，只記錄錯誤
+            return data.address;
         });
     }
 

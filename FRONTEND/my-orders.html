@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>我的訂單 - 3C 管理系統</title>
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/my-orders.css">
     <style>
         .order-list { list-style: none; padding: 0; }
         .order-item { background: #fff; border: 1px solid #ddd; margin-bottom: 15px; padding: 15px; border-radius: 5px; }
@@ -14,21 +15,39 @@
         .order-products-list { list-style: disc; margin-left: 20px; }
         .order-products-list li { margin-bottom: 5px; }
         .pagination { margin-top: 20px; text-align: center; }
-        .pagination button { padding: 8px 12px; margin: 0 5px; cursor: pointer; }
-        .pagination button:disabled { cursor: default; background-color: #eee; }
+        .pagination button { margin: 0 5px; padding: 8px 12px; border: 1px solid #ddd; background: #fff; cursor: pointer; }
+        .pagination button:disabled { background: #007bff; color: white; cursor: not-allowed; }
     </style>
 </head>
 <body>
     <header>
-        <nav id="main-navigation"></nav>
-    </header>
-    <main>
-        <h1>我的歷史訂單</h1>
-        <div id="orders-container">
-            <p>載入訂單中...</p>
+        <div class="container">
+            <h1 class="logo">3C管理系統</h1>
+            <nav id="main-navigation">
+                <!-- 動態生成的導航元素將在這裡顯示 -->
+            </nav>
         </div>
-        <div id="orders-pagination" class="pagination"></div>
+    </header>
+
+    <main class="container">
+        <h1>我的訂單</h1>
+        
+        <div class="orders-container">
+            <div id="orders-container">
+                <p>載入訂單中...</p>
+            </div>
+            
+            <div id="orders-pagination" class="pagination">
+                <!-- 分頁按鈕將在這裡動態載入 -->
+            </div>
+        </div>
     </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2023 3C管理系統. 保留所有權利.</p>
+        </div>
+    </footer>
 
     <script src="js/navigation.js"></script>
     <script src="js/my-orders.js"></script>

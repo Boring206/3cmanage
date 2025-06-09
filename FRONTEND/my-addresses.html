@@ -10,66 +10,69 @@
         .address-list { list-style: none; padding: 0; }
         .address-item { background: #fff; border: 1px solid #ddd; margin-bottom: 15px; padding: 15px; border-radius: 5px; position: relative; }
         .address-item h3 { margin-top: 0; }
-        .address-item p { margin: 5px 0; }
-        .address-actions { margin-top: 10px; }
-        .address-actions button, .address-actions a {
-            margin-right: 10px;
-            padding: 6px 10px;
-            font-size: 0.9em;
-            cursor: pointer;
-            border-radius: 3px;
-            text-decoration: none;
-        }
-        .edit-address-btn { background-color: #ffc107; color: black; border: none; }
-        .delete-address-btn { background-color: #dc3545; color: white; border: none; }
-        .set-default-btn { background-color: #17a2b8; color: white; border: none; }
-        .default-badge {
-            background-color: #28a745; color: white; padding: 3px 8px; font-size: 0.8em;
-            border-radius: 3px; position: absolute; top: 15px; right: 15px;
-        }
-        #add-address-form-container { margin-top: 30px; padding-top: 20px; border-top: 1px solid #ccc; }
+        .address-item .address-actions { margin-top: 10px; }
+        .address-item .address-actions button { margin-right: 10px; }
+        .default-badge { background: #28a745; color: white; padding: 3px 8px; border-radius: 3px; font-size: 0.8em; position: absolute; top: 10px; right: 10px; }
+        .form-message { padding: 10px; margin: 10px 0; border-radius: 4px; }
+        .form-message.success { background-color: #d4edda; border-color: #c3e6cb; color: #155724; }
+        .form-message.error { background-color: #f8d7da; border-color: #f5c6cb; color: #721c24; }
     </style>
 </head>
 <body>
     <header>
-        <nav id="main-navigation"></nav>
+        <div class="container">
+            <h1 class="logo">3C管理系統</h1>
+            <nav id="main-navigation">
+                <!-- 動態生成的導航元素將在這裡顯示 -->
+            </nav>
+        </div>
     </header>
-    <main>
-        <h1>管理我的地址</h1>
-        <button id="show-add-address-form-btn" style="margin-bottom: 20px; padding: 10px 15px; background-color: #007bff; color:white; border:none; border-radius:4px; cursor:pointer;">新增地址</button>
+
+    <main class="container">
+        <h1>我的地址管理</h1>
+        
+        <button id="show-add-address-form-btn" class="btn primary">新增地址</button>
         
         <div id="add-address-form-container" style="display:none;">
             <h2 id="address-form-title">新增地址</h2>
             <form id="address-form">
-                <input type="hidden" id="address-id" name="address_id">
+                <input type="hidden" name="address_id" value="">
+                
                 <div class="form-group">
                     <label for="recipient_name">收件人姓名:</label>
                     <input type="text" id="recipient_name" name="recipient_name" required>
                 </div>
+                
                 <div class="form-group">
-                    <label for="phone_number">電話號碼:</label>
+                    <label for="phone_number">聯絡電話:</label>
                     <input type="tel" id="phone_number" name="phone_number" required>
                 </div>
+                
                 <div class="form-group">
                     <label for="postal_code">郵遞區號:</label>
                     <input type="text" id="postal_code" name="postal_code" required>
                 </div>
+                
                 <div class="form-group">
-                    <label for="city">城市/縣市:</label>
+                    <label for="city">城市:</label>
                     <input type="text" id="city" name="city" required>
                 </div>
+                
                 <div class="form-group">
                     <label for="street">街道地址:</label>
                     <input type="text" id="street" name="street" required>
                 </div>
+                
                 <div class="form-group">
                     <label for="country">國家:</label>
                     <input type="text" id="country" name="country" value="Taiwan" required>
                 </div>
-                <div class="form-group">
-                    <input type="checkbox" id="is_default" name="is_default" value="1">
-                    <label for="is_default" style="display:inline; font-weight:normal;">設為預設地址</label>
+                
+                <div class="form-check">
+                    <input type="checkbox" id="is_default" name="is_default">
+                    <label for="is_default">設為預設地址</label>
                 </div>
+                
                 <button type="submit" id="submit-address-btn">儲存地址</button>
                 <button type="button" id="cancel-edit-btn" style="display:none; margin-left:10px; background-color:#6c757d;">取消編輯</button>
                 <p id="address-form-message" class="form-message"></p>
@@ -81,6 +84,12 @@
             <p>載入地址中...</p>
         </div>
     </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2023 3C管理系統. 保留所有權利.</p>
+        </div>
+    </footer>
 
     <script src="js/navigation.js"></script>
     <script src="js/my-addresses.js"></script>

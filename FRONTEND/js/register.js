@@ -1,12 +1,14 @@
 // FRONTEND/js/register.js
 document.addEventListener('DOMContentLoaded', function() {
     const registerForm = document.getElementById('register-form');
-    const messageElement = document.getElementById('form-message');    // !!! 非常重要：根據您的伺服器設定修改此 API 基本路徑 !!!
+    const messageElement = document.getElementById('form-message');
+    
+    // !!! 非常重要：根據您的伺服器設定修改此 API 基本路徑 !!!
     const API_BASE_PATH = '/3Cmanage/BACKEND/public'; // 注意大小寫要和資料夾名稱一致
 
     if (registerForm) {
         registerForm.addEventListener('submit', function(event) {
-            event.preventDefault(); // 防止表單的傳統提交方式
+            event.preventDefault();
             clearMessage();
 
             const name = document.getElementById('name').value;
@@ -14,6 +16,12 @@ document.addEventListener('DOMContentLoaded', function() {
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
             const confirmPassword = document.getElementById('confirm_password').value;
+
+            // 基本驗證
+            if (!name || !username || !email || !password || !confirmPassword) {
+                showMessage('請填寫所有必要欄位。', 'error');
+                return;
+            }
 
             if (password !== confirmPassword) {
                 showMessage('密碼與確認密碼不相符。', 'error');

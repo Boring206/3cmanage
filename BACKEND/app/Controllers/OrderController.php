@@ -200,21 +200,30 @@ class OrderController extends Controller {
         $limit = isset($_GET['limit']) ? max(1, (int)$_GET['limit']) : 10;
         $offset = ($page - 1) * $limit;
         
-        // 獲取用戶的訂單
-        $orders = $this->orderModel->getByUserId($userId, $limit, $offset);
-        $totalCount = $this->orderModel->countByUserId($userId);
-        
-        $totalPages = ceil($totalCount / $limit);
-        
-        return $this->jsonResponse([
-            'data' => $orders,
-            'meta' => [
-                'current_page' => $page,
-                'last_page' => $totalPages,
-                'per_page' => $limit,
-                'total' => $totalCount
-            ]
-        ]);
+        try {
+            // 獲取用戶的訂單 - 使用正確的方法名稱
+            $orders = $this->orderModel->getByUserId($userId, $limit, $offset);
+            $totalCount = $this->orderModel->countByUserId($userId);
+            
+            if ($orders === false) {
+                return $this->errorResponse('Could not fetch your orders.', 500);
+            }
+            
+            $totalPages = ceil($totalCount / $limit);
+            
+            return $this->jsonResponse([
+                'data' => $orders,
+                'meta' => [
+                    'current_page' => $page,
+                    'last_page' => $totalPages,
+                    'per_page' => $limit,
+                    'total' => $totalCount
+                ]
+            ]);
+        } catch (\Exception $e) {
+            error_log('Error fetching orders for user ' . $userId . ': ' . $e->getMessage());
+            return $this->errorResponse('Failed to fetch orders.', 500);
+        }
     }
     
     /**
@@ -230,22 +239,27 @@ class OrderController extends Controller {
         
         $orderId = (int)$params['id'];
         
-        // 獲取訂單基本資訊（確保用戶只能查看自己的訂單）
-        $order = $this->orderModel->findById($orderId, $userId);
-        
-        if (!$order) {
-            return $this->errorResponse('Order not found or you do not have permission to view it.', 404);
+        try {
+            // 獲取訂單基本資訊（確保用戶只能查看自己的訂單） - 使用正確的方法名稱
+            $order = $this->orderModel->findById($orderId, $userId);
+            
+            if (!$order) {
+                return $this->errorResponse('Order not found or you do not have permission to view it.', 404);
+            }
+            
+            // 獲取訂單項目
+            $items = $this->orderModel->getOrderItems($orderId);
+            
+            $orderData = [
+                'order' => $order,
+                'items' => $items
+            ];
+            
+            return $this->jsonResponse(['data' => $orderData]);
+        } catch (\Exception $e) {
+            error_log('Error fetching order ' . $orderId . ' for user ' . $userId . ': ' . $e->getMessage());
+            return $this->errorResponse('Failed to fetch order details.', 500);
         }
-        
-        // 獲取訂單項目
-        $items = $this->orderModel->getOrderItems($orderId);
-        
-        $orderData = [
-            'order' => $order,
-            'items' => $items
-        ];
-        
-        return $this->jsonResponse(['data' => $orderData]);
     }
     
     /**
@@ -318,20 +332,25 @@ class OrderController extends Controller {
             'notes' => $input['notes'] ?? null
         ];
         
-        // 創建訂單（這會在事務中處理所有項目和庫存調整）
-        $orderId = $this->orderModel->create($orderData, $items);
-        
-        if ($orderId) {
-            // 獲取完整訂單資料
-            $order = $this->orderModel->findById($orderId);
-            $orderItems = $this->orderModel->getOrderItems($orderId);
+        try {
+            // 創建訂單（這會在事務中處理所有項目和庫存調整） - 使用正確的方法名稱
+            $orderId = $this->orderModel->create($orderData, $items);
             
-            return $this->jsonResponse([
-                'message' => 'Order placed successfully.',
-                'order' => $order,
-                'items' => $orderItems
-            ], 201);
-        } else {
+            if ($orderId) {
+                // 獲取完整訂單資料
+                $order = $this->orderModel->findById($orderId);
+                $orderItems = $this->orderModel->getOrderItems($orderId);
+                
+                return $this->jsonResponse([
+                    'message' => 'Order placed successfully.',
+                    'order' => $order,
+                    'items' => $orderItems
+                ], 201);
+            } else {
+                return $this->errorResponse('Failed to create order.', 500);
+            }
+        } catch (\Exception $e) {
+            error_log('Error creating order for user ' . $userId . ': ' . $e->getMessage());
             return $this->errorResponse('Failed to create order.', 500);
         }
     }

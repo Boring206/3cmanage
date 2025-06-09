@@ -21,9 +21,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function fetchAddresses() {
         addressesContainer.innerHTML = '<p>載入地址中...</p>';
-        fetch(`${API_BASE_PATH}/my/addresses`, {
+        fetch(`${API_BASE_PATH}/addresses`, {
             method: 'GET',
-            headers: { 'Content-Type': 'application/json' }
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include'
         })
         .then(response => handleAuthError(response))
         .then(data => {
@@ -119,10 +120,14 @@ document.addEventListener('DOMContentLoaded', function() {
     
     async function fetchAndPopulateEditForm(addressId) {
         try {
-            // 實際上後端應該提供一個 GET /my/addresses/{id} 的接口
+            // 實際上後端應該提供一個 GET /addresses/{id} 的接口
             // 這裡我們先假設一個場景：從列表數據中找到對應的
             // 為簡化，這裡重新 fetch 列表並找到對應的項目
-            const response = await fetch(`${API_BASE_PATH}/my/addresses`);
+            const response = await fetch(`${API_BASE_PATH}/addresses`, {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include'
+            });
             const data = await handleAuthError(response);
             if (data.data) {
                 localStorage.setItem('myAddressesCache', JSON.stringify(data.data)); // 更新快取
@@ -162,13 +167,13 @@ document.addEventListener('DOMContentLoaded', function() {
         // is_default 如果沒勾選，FormData 不會包含它，所以要手動處理
         addressData.is_default = addressForm.is_default.checked ? 1 : 0;
 
-
-        const url = editingAddressId ? `${API_BASE_PATH}/my/addresses/${editingAddressId}` : `${API_BASE_PATH}/my/addresses`;
+        const url = editingAddressId ? `${API_BASE_PATH}/addresses/${editingAddressId}` : `${API_BASE_PATH}/addresses`;
         const method = editingAddressId ? 'PUT' : 'POST';
 
         fetch(url, {
             method: method,
             headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
             body: JSON.stringify(addressData)
         })
         .then(response => handleAuthError(response))
@@ -192,7 +197,10 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function deleteAddress(addressId) {
-        fetch(`${API_BASE_PATH}/my/addresses/${addressId}`, { method: 'DELETE' })
+        fetch(`${API_BASE_PATH}/addresses/${addressId}`, { 
+            method: 'DELETE',
+            credentials: 'include'
+        })
         .then(response => handleAuthError(response))
         .then(data => {
             if (data.message) {
@@ -213,7 +221,10 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function setDefaultAddress(addressId) {
-        fetch(`${API_BASE_PATH}/my/addresses/${addressId}/set-default`, { method: 'POST' })
+        fetch(`${API_BASE_PATH}/addresses/${addressId}/set-default`, { 
+            method: 'POST',
+            credentials: 'include'
+        })
         .then(response => handleAuthError(response))
         .then(data => {
             if (data.message) {
